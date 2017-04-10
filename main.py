@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QGridLayout,
                              QVBoxLayout, QHBoxLayout, QLabel, QPushButton, 
                              QFileDialog, QAction)
 from PyQt5.QtGui import QPixmap
+from PyQt5 import QtCore 
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -30,12 +31,12 @@ class MainWindow(QMainWindow):
         buttonLayout.addWidget(self.prevButton, 0, 0)
         buttonLayout.addWidget(self.nextButton, 0, 1)
         
-        pictureLabel = QLabel()
-        pictureLabel.setPixmap(QPixmap('usagi.jpg'))
-        pictureLabel.show()
+        self.pictureLabel = QLabel()
+        self.pictureLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.putPixmap('usagi.jpg')
         
         mainLayout = QVBoxLayout()
-        mainLayout.addWidget(pictureLabel)
+        mainLayout.addWidget(self.pictureLabel)
         mainLayout.addLayout(buttonLayout)
         
         mainWidget = QWidget()
@@ -66,21 +67,50 @@ class MainWindow(QMainWindow):
         fileMenu.addAction(openAction)
         fileMenu.addAction(saveAction)
         fileMenu.addAction(addImageAction)
-
+        
+        # Initialize image annotation infomation list
+        self.imageDataList = []
+        self.imageIndex = 0
+    
+    def putPixmap(self, filepath):
+        # Pixmapをパスから読み込んでラベルにセットする
+        pixmap = QPixmap(filepath)
+        self.pictureLabel.setPixmap(pixmap.scaled(256, 256, QtCore.Qt.KeepAspectRatio))
+        self.pictureLabel.show()
+    
     def showPrevImage(self):
-        print('Prev')
+        if len(self.imageDataList) > 0:
+            self.imageIndex = (self.imageIndex - 1) % len(self.imageDataList)
+            self.putPixmap(self.imageDataList[self.imageIndex]['filepath'])
     
     def showNextImage(self):
-        print('Next')
+        if len(self.imageDataList) > 0:
+            self.imageIndex = (self.imageIndex + 1) % len(self.imageDataList)
+            self.putPixmap(self.imageDataList[self.imageIndex]['filepath'])
         
     def openAnnotationFile(self):
-        print(QFileDialog.getOpenFileName(parent=self, filter='*.json'))
+        QFileDialog.getOpenFileName(parent=self, filter='*.json')
     
     def saveAnnotationFile(self):
         print('Save')
+        print(self.imageDataList)
     
     def addImageFile(self):
-        print(QFileDialog.getOpenFileNames(parent=self, filter='*.png *.jpg *.jpeg *.bmp'))
+        # Open file dialog for adding images
+        selectedImagePathList = QFileDialog.getOpenFileNames(parent=self, filter='*.png *.jpg *.jpeg *.bmp')[0]
+        # Image path list
+        imagePathList = [imageData['filepath'] for imageData in self.imageDataList]
+        # Add selected images to imagePathList 
+        for imagePath in selectedImagePathList:
+            # まだ追加されていない画像ならリストに追加する
+            if not (imagePath in imagePathList):
+                self.imageDataList.append({'filepath' : imagePath, 'annotation' : None})
+        
+        # 画像があるなら開く
+        if len(self.imageDataList) > 0:
+            self.imageIndex = len(self.imageDataList) - 1
+            self.putPixmap(self.imageDataList[self.imageIndex]['filepath'])
+            
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
