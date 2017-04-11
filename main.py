@@ -10,7 +10,7 @@ Lite Image Annotation Tool : koala
 import sys
 import json
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QGridLayout, 
-                             QVBoxLayout, QHBoxLayout, QLabel, QPushButton, 
+                             QVBoxLayout, QLabel, QPushButton, 
                              QFileDialog, QAction)
 from PyQt5.QtGui import QPixmap
 from PyQt5 import QtCore 
