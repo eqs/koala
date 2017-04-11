@@ -38,11 +38,11 @@ class MainWindow(QMainWindow):
         # 画像をスライドするボタンの設定
         self.prevButton = QPushButton('&Prev')
         self.prevButton.clicked.connect(self.showPrevImage)
-        self.prevButton.setShortcut('H')
+        self.prevButton.setShortcut(QtCore.Qt.Key_Left)
         
         self.nextButton = QPushButton('&Next')
         self.nextButton.clicked.connect(self.showNextImage)
-        self.nextButton.setShortcut('L')
+        self.nextButton.setShortcut(QtCore.Qt.Key_Right)
         
         buttonLayout = QGridLayout()
         buttonLayout.addWidget(self.prevButton, 0, 0)
