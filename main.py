@@ -117,10 +117,11 @@ class MainWindow(QMainWindow):
     
     def anotateClass(self):
         # 押されたボタンの情報から，ラベリングを行う
-        text = self.sender().text()
-        dataClass = text[1:text.index(':')-1].strip()
-        self.imageDataList[self.imageIndex]['class'] = dataClass
-        self.updateDataInformation()
+        if len(self.imageDataList) > 0:
+            text = self.sender().text()
+            dataClass = text[1:text.index(':')-1].strip()
+            self.imageDataList[self.imageIndex]['class'] = dataClass
+            self.updateDataInformation()
     
     def updateDataInformation(self):
         # 現在選択しているデータのパスとクラスをラベルに表示する
