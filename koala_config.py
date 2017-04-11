@@ -8,14 +8,10 @@ Created on Tue Apr 11 09:48:53 2017
 BUTTON_CONFIG = [
     {
          'key' : 'A', 
-         'class' : 'dipping_gestures'
+         'class' : 'positive'
     }, 
     {
          'key' : 'S', 
-         'class' : 'other_gestures'
+         'class' : 'negative'
     },
-    {
-         'key' : 'D',
-         'class' : 'other_things'
-    }
 ]
