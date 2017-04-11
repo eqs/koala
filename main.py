@@ -8,6 +8,7 @@ Lite Image Annotation Tool : koala
 """
 
 import sys
+import json
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QGridLayout, 
                              QVBoxLayout, QHBoxLayout, QLabel, QPushButton, 
                              QFileDialog, QAction)
@@ -92,6 +93,11 @@ class MainWindow(QMainWindow):
         saveAction.setStatusTip('Save annotation file')
         saveAction.triggered.connect(self.saveAnnotationFile)
         
+        newSaveAction = QAction('&Save As', self)
+        newSaveAction.setShortcut('Ctrl+Shift+S')
+        newSaveAction.setStatusTip('Save annotation as new file')
+        newSaveAction.triggered.connect(self.newSaveAnnotationFile)
+        
         addImageAction = QAction('&Add Image', self)
         addImageAction.setShortcut('Ctrl+I')
         addImageAction.setStatusTip('Add image files')
@@ -103,11 +109,15 @@ class MainWindow(QMainWindow):
         fileMenu = menuBar.addMenu('&File')
         fileMenu.addAction(openAction)
         fileMenu.addAction(saveAction)
+        fileMenu.addAction(newSaveAction)
         fileMenu.addAction(addImageAction)
         
         # Initialize image annotation infomation list
         self.imageDataList = []
         self.imageIndex = 0
+        
+        # 開いているファイルのパス
+        self.openingFilePath = ''
     
     def putPixmap(self, filepath):
         # Pixmapをパスから読み込んでラベルにセットする
@@ -142,11 +152,46 @@ class MainWindow(QMainWindow):
             self.updateDataInformation()
         
     def openAnnotationFile(self):
-        QFileDialog.getOpenFileName(parent=self, filter='*.json')
+        # アノテーションの情報を読み込む
+        openFilePath = QFileDialog.getOpenFileName(parent=self, filter='*.json')[0]
+        # キャンセルされなければ読み込み
+        if len(openFilePath) > 0:
+            with open(openFilePath, 'r') as f:
+                self.imageDataList = json.load(f)
+                self.imageIndex = 0
+                self.putPixmap(self.imageDataList[self.imageIndex]['filepath'])
+                self.updateDataInformation()
+                
+                self.openingFilePath = openFilePath
+                self.setWindowTitle('koala - {0}'.format(self.openingFilePath))
+                
     
     def saveAnnotationFile(self):
-        print('Save')
-        print(self.imageDataList)
+        # 新規のファイルなら保存のダイアログを出す
+        if self.openingFilePath == '':
+            # アノテーションの情報を保存する
+            saveFilePath = QFileDialog.getSaveFileName(parent=self, filter='*.json')[0]
+            # キャンセルされなければ保存
+            if len(saveFilePath) > 0:
+                with open(saveFilePath, 'w') as f:
+                    json.dump(self.imageDataList, f, ensure_ascii=False, indent=4)
+                    self.openingFilePath = saveFilePath
+                    self.setWindowTitle('koala - {0}'.format(self.openingFilePath))
+                    self.statusBar().showMessage('New annotation file is saved as "{0}"'.format(self.openingFilePath))
+        else:
+            with open(self.openingFilePath, 'w') as f:
+                json.dump(self.imageDataList, f, ensure_ascii=False, indent=4)
+                self.statusBar().showMessage('Annotation file is saved.'.format(self.openingFilePath))
+        
+    def newSaveAnnotationFile(self): # 名前をつけて保存
+        saveFilePath = QFileDialog.getSaveFileName(parent=self, filter='*.json')[0]
+        # キャンセルされなければ保存
+        if len(saveFilePath) > 0:
+            with open(saveFilePath, 'w') as f:
+                json.dump(self.imageDataList, f, ensure_ascii=False, indent=4)
+                self.openingFilePath = saveFilePath
+                self.setWindowTitle('koala - {0}'.format(self.openingFilePath))
+                self.statusBar().showMessage('New annotation file is saved as "{0}"'.format(self.openingFilePath))
     
     def addImageFile(self):
         # Open file dialog for adding images
