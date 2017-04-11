@@ -54,15 +54,18 @@ class MainWindow(QMainWindow):
         self.pictureLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.putPixmap('usagi.jpg')
         
+        self.indexLabel = QLabel('')
+        self.indexLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.pathLabel = QLabel('')
         self.pathLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.classLabel = QLabel('')
         self.classLabel.setAlignment(QtCore.Qt.AlignCenter)
         
         pictureLayout = QGridLayout()
-        pictureLayout.addWidget(self.pictureLabel, 0, 0)
-        pictureLayout.addWidget(self.pathLabel, 1, 0)
-        pictureLayout.addWidget(self.classLabel, 2, 0)
+        pictureLayout.addWidget(self.indexLabel, 0, 0)
+        pictureLayout.addWidget(self.pictureLabel, 1, 0)
+        pictureLayout.addWidget(self.pathLabel, 2, 0)
+        pictureLayout.addWidget(self.classLabel, 3, 0)
         
         # アノテーションをするためのボタンの設定
         annotationButtonLayout = QGridLayout()
@@ -136,6 +139,7 @@ class MainWindow(QMainWindow):
     def updateDataInformation(self):
         # 現在選択しているデータのパスとクラスをラベルに表示する
         if len(self.imageDataList) > 0:
+            self.indexLabel.setText('{0} / {1}'.format(self.imageIndex+1, len(self.imageDataList)))
             self.pathLabel.setText(self.imageDataList[self.imageIndex]['filepath'])
             self.classLabel.setText(self.imageDataList[self.imageIndex]['class'])
     
