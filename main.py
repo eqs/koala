@@ -15,20 +15,7 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QGridLayout,
 from PyQt5.QtGui import QPixmap
 from PyQt5 import QtCore 
 
-BUTTON_CONFIG = [
-    {
-         'key' : 'A', 
-         'class' : 'dipping_gestures'
-    }, 
-    {
-         'key' : 'S', 
-         'class' : 'other_gestures'
-    },
-    {
-         'key' : 'D',
-         'class' : 'other_things'
-    }
-]
+exec(open('koala_config.py').read())
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
