@@ -52,7 +52,7 @@ class MainWindow(QMainWindow):
         # 画像を表示するラベルの設定
         self.pictureLabel = QLabel()
         self.pictureLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.putPixmap('usagi.jpg')
+        self.putPixmap('startimage.png')
         
         self.indexLabel = QLabel('')
         self.indexLabel.setAlignment(QtCore.Qt.AlignCenter)
