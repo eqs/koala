@@ -9,11 +9,12 @@ Lite Image Annotation Tool : koala
 
 import sys
 import json
-from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QGridLayout, 
-                             QVBoxLayout, QLabel, QPushButton, 
-                             QFileDialog, QAction)
-from PyQt5.QtGui import QPixmap
-from PyQt5 import QtCore 
+from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QGridLayout,
+                             QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
+                             QFileDialog, QAction, QTreeWidget,
+                             QTreeWidgetItem)
+from PyQt5.QtGui import QPixmap, QFont
+from PyQt5 import QtCore
 
 exec(open('koala_config.py').read())
 
@@ -64,15 +65,25 @@ class MainWindow(QMainWindow):
             button.clicked.connect(self.anotateClass)
             button.setShortcut(conf['key'])
             annotationButtonLayout.addWidget(button, 0, k)
-        
+
+        # 画像のパス一覧を表示するためのリスト
+        self.treeWidget = QTreeWidget()
+        self.treeWidget.setColumnCount(2)
+        self.treeWidget.setHeaderLabels(['#', 'filepath', 'class'])
+        self.treeWidget.itemSelectionChanged.connect(self.showImageFromTree)
+
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(pictureLayout)
         mainLayout.addLayout(annotationButtonLayout)
         mainLayout.addLayout(buttonLayout)
-        
-        mainWidget = QWidget()
-        mainWidget.setLayout(mainLayout)
-        self.setCentralWidget(mainWidget)
+
+        topLayout = QHBoxLayout()
+        topLayout.addWidget(self.treeWidget)
+        topLayout.addLayout(mainLayout)
+
+        topWidget = QWidget()
+        topWidget.setLayout(topLayout)
+        self.setCentralWidget(topWidget)
         self.setWindowTitle('koala')
 
         # Initialize menu bar and status bar
@@ -144,7 +155,22 @@ class MainWindow(QMainWindow):
             self.imageIndex = (self.imageIndex + 1) % len(self.imageDataList)
             self.putPixmap(self.imageDataList[self.imageIndex]['filepath'])
             self.updateDataInformation()
-        
+
+    def showIntendedImage(self, idx):
+        """ 番号で指定した画像を表示する """
+        if len(self.imageDataList) > 0 and 0 <= idx <= len(self.imageDataList):
+            self.imageIndex = idx
+            self.putPixmap(self.imageDataList[self.imageIndex]['filepath'])
+            self.updateDataInformation()
+
+
+    def showImageFromTree(self):
+        """ TreeWidget上でアイテムが指定されたらその番号の画像にジャンプする """
+        indices = self.treeWidget.selectedIndexes()
+        if indices:
+            selectedIndex = indices[0].row()
+            self.showIntendedImage(selectedIndex)
+
     def openAnnotationFile(self):
         # アノテーションの情報を読み込む
         openFilePath = QFileDialog.getOpenFileName(parent=self, filter='*.json')[0]
@@ -155,7 +181,8 @@ class MainWindow(QMainWindow):
                 self.imageIndex = 0
                 self.putPixmap(self.imageDataList[self.imageIndex]['filepath'])
                 self.updateDataInformation()
-                
+                self.updateImageList()
+
                 self.openingFilePath = openFilePath
                 self.setWindowTitle('koala - {0}'.format(self.openingFilePath))
 
@@ -203,8 +230,14 @@ class MainWindow(QMainWindow):
             self.imageIndex = len(self.imageDataList) - 1
             self.putPixmap(self.imageDataList[self.imageIndex]['filepath'])
             self.updateDataInformation()
-            
-        
+            self.updateImageList()
+
+    def updateImageList(self):
+        self.treeWidget.clear()
+        for idx, imageData in enumerate(self.imageDataList):
+            treeWidgetItem = QTreeWidgetItem([str(idx + 1), imageData['filepath'], imageData['class']])
+            self.treeWidget.addTopLevelItem(treeWidgetItem)
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     mainWindow = MainWindow()
