@@ -48,6 +48,10 @@ class MainWindow(QMainWindow):
         self.classLabel = QLabel('')
         self.classLabel.setAlignment(QtCore.Qt.AlignCenter)
         
+        classLabelFont = QFont()
+        classLabelFont.setPointSize(32)
+        self.classLabel.setFont(classLabelFont)
+
         pictureLayout = QGridLayout()
         pictureLayout.addWidget(self.indexLabel, 0, 0)
         pictureLayout.addWidget(self.pictureLabel, 1, 0)
