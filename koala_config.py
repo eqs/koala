@@ -7,11 +7,13 @@ Created on Tue Apr 11 09:48:53 2017
 
 BUTTON_CONFIG = [
     {
-         'key' : 'A', 
-         'class' : 'positive'
-    }, 
+         'key' : 'A',
+         'class' : 'positive',
+         'color' : 'red'
+    },
     {
-         'key' : 'S', 
-         'class' : 'negative'
+         'key' : 'S',
+         'class' : 'negative',
+         'color' : 'blue'
     },
 ]

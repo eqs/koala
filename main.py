@@ -13,10 +13,12 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication, QWidget, QGridLayout,
                              QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
                              QFileDialog, QAction, QTreeWidget,
                              QTreeWidgetItem)
-from PyQt5.QtGui import QPixmap, QFont
+from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5 import QtCore
 
 exec(open('koala_config.py').read())
+# クラス名からカラーへのマップを作る
+CLASS_TO_COLOR = {config['class'] : config['color'] for config in BUTTON_CONFIG}
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -69,7 +71,7 @@ class MainWindow(QMainWindow):
         # 画像のパス一覧を表示するためのリスト
         self.treeWidget = QTreeWidget()
         self.treeWidget.setColumnCount(2)
-        self.treeWidget.setHeaderLabels(['#', 'filepath', 'class'])
+        self.treeWidget.setHeaderLabels(['#', 'filepath', 'class', 'corrected'])
         self.treeWidget.itemSelectionChanged.connect(self.showImageFromTree)
 
         mainLayout = QVBoxLayout()
@@ -134,13 +136,18 @@ class MainWindow(QMainWindow):
         if len(self.imageDataList) > 0:
             text = self.sender().text()
             dataClass = text[1:text.index(':')-1].strip()
-            self.imageDataList[self.imageIndex]['class'] = dataClass
+            # ラベルの変更があったときだけデータの変更を行う
+            if self.imageDataList[self.imageIndex]['class'] != dataClass:
+                self.imageDataList[self.imageIndex]['class'] = dataClass
+                self.imageDataList[self.imageIndex]['corrected'] = not self.imageDataList[self.imageIndex]['corrected']
             self.updateDataInformation()
 
             # Update Image List
             root = self.treeWidget.invisibleRootItem()
             item = root.child(self.imageIndex)
             item.setText(2, self.imageDataList[self.imageIndex]['class'])
+            item.setBackground(2, QColor(CLASS_TO_COLOR[self.imageDataList[self.imageIndex]['class']]))
+            item.setText(3, str(self.imageDataList[self.imageIndex]['corrected']))
 
 
     def updateDataInformation(self):
@@ -149,6 +156,8 @@ class MainWindow(QMainWindow):
             self.indexLabel.setText('{0} / {1}'.format(self.imageIndex+1, len(self.imageDataList)))
             self.pathLabel.setText(self.imageDataList[self.imageIndex]['filepath'])
             self.classLabel.setText(self.imageDataList[self.imageIndex]['class'])
+            self.classLabel.setStyleSheet('color : {0}'.format(CLASS_TO_COLOR[self.imageDataList[self.imageIndex]['class']]))
+
 
     def showPrevImage(self):
         if len(self.imageDataList) > 0:
@@ -229,7 +238,10 @@ class MainWindow(QMainWindow):
         for imagePath in selectedImagePathList:
             # まだ追加されていない画像ならリストに追加する
             if not (imagePath in imagePathList):
-                self.imageDataList.append({'filepath' : imagePath, 'class' : None})
+                self.imageDataList.append({'#' : len(self.imageDataList),
+                                           'filepath' : imagePath,
+                                           'class' : None,
+                                           'corrected' : False})
 
         # 画像があるなら開く
         if len(self.imageDataList) > 0:
@@ -241,7 +253,11 @@ class MainWindow(QMainWindow):
     def updateImageList(self):
         self.treeWidget.clear()
         for idx, imageData in enumerate(self.imageDataList):
-            treeWidgetItem = QTreeWidgetItem(['{0:7d}'.format(idx + 1), imageData['filepath'], imageData['class']])
+            treeWidgetItem = QTreeWidgetItem(['{0:7d}'.format(idx + 1),
+                                              imageData['filepath'],
+                                              imageData['class'],
+                                              str(imageData['corrected'])])
+            treeWidgetItem.setBackground(2, QColor(CLASS_TO_COLOR[imageData['class']]))
             self.treeWidget.addTopLevelItem(treeWidgetItem)
 
 if __name__ == '__main__':
