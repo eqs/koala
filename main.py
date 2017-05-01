@@ -137,6 +137,12 @@ class MainWindow(QMainWindow):
             self.imageDataList[self.imageIndex]['class'] = dataClass
             self.updateDataInformation()
 
+            # Update Image List
+            root = self.treeWidget.invisibleRootItem()
+            item = root.child(self.imageIndex)
+            item.setText(2, self.imageDataList[self.imageIndex]['class'])
+
+
     def updateDataInformation(self):
         # 現在選択しているデータのパスとクラスをラベルに表示する
         if len(self.imageDataList) > 0:
@@ -235,7 +241,7 @@ class MainWindow(QMainWindow):
     def updateImageList(self):
         self.treeWidget.clear()
         for idx, imageData in enumerate(self.imageDataList):
-            treeWidgetItem = QTreeWidgetItem([str(idx + 1), imageData['filepath'], imageData['class']])
+            treeWidgetItem = QTreeWidgetItem(['{0:7d}'.format(idx + 1), imageData['filepath'], imageData['class']])
             self.treeWidget.addTopLevelItem(treeWidgetItem)
 
 if __name__ == '__main__':
