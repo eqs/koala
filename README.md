@@ -1,5 +1,7 @@
-# koala : Lite Image Annotation Tool
+# koala : Image Annotation Tool for Classification
 
-* koala is image annotation tool that has simple interface.
-* koala is inspired by sloth (https://github.com/cvhciKIT/sloth).
+* koalaはシンプルなUIを持つ画像アノテーションツールです
+* クラス分類タスクのためのアノテーションを行うことが可能です
+
+
 
