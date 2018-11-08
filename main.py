@@ -2,7 +2,7 @@
 """
 Created on 04/04/17 17:17:41
 
-Lite Image Annotation Tool : koala
+koala: Image Annotation Tool for Classification
 
 @author: eqs
 """
